@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Brecha - Apolo Pay</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Apolo Pay Calc">
+  
+  <!-- PWA Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0OCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9Ijk2IiB5PSIxMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0OCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QVA8L3RleHQ+PC9zdmc+">
+  
+  <!-- Google Fonts (ejemplo) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Reset y variables */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Light Theme */
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #718096;
+      --border-color: #e2e8f0;
+      --card-bg: #ffffff;
+      --input-bg: #ffffff;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      
+      /* Brand Colors */
+      --primary: #3b82f6; /* Azul más vibrante */
+      --primary-light: #60a5fa;
+      --primary-dark: #2563eb;
+      --success: #10b981;
+      --success-light: #34d399;
+      --warning: #f59e0b;
+      --warning-light: #fbbf24;
+      --danger: #ef4444;
+      --danger-light: #f87171;
+      
+      /* Theme Toggle */
+      --toggle-bg: #e2e8f0;
+      --toggle-thumb: #ffffff;
+      
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    [data-theme="dark"] {
+      /* Dark Theme */
+      --bg-primary: #1a202c;
+      --bg-secondary: #2d3748;
+      --bg-tertiary: #4a5568;
+      --text-primary: #f7fafc;
+      --text-secondary: #cbd5e0;
+      --text-muted: #a0aec0;
+      --border-color: #4a5568;
+      --card-bg: #2d3748;
+      --input-bg: #4a5568;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+      
+      /* Theme Toggle */
+      --toggle-bg: #4a5568;
+      --toggle-thumb: #f7fafc;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      min-height: 100vh;
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 480px; /* Un poco más ancho para mejor distribución */
+      margin: 0 auto;
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-top: 20px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      box-shadow: var(--shadow);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .theme-toggle {
+      position: relative;
+      width: 60px;
+      height: 30px;
+      background: var(--toggle-bg);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 22px;
+      height: 22px;
+      background: var(--toggle-thumb);
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      transform: translateX(30px);
+    }
+
+    .theme-icon {
+      font-size: 14px;
+      transition: opacity 0.3s ease;
+      line-height: 1; /* Asegura que el emoji no se desborde */
+    }
+
+    .theme-icon.sun {
+      opacity: 1;
+    }
+
+    .theme-icon.moon {
+      opacity: 0;
+    }
+
+    [data-theme="dark"] .theme-icon.sun {
+      opacity: 0;
+    }
+
+    [data-theme="dark"] .theme-icon.moon {
+      opacity: 1;
+    }
+
+    .title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 32px; /* Más grande */
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--success));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 17px; /* Más legible */
+      font-weight: 500;
+    }
+
+    /* Pestañas de navegación */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 2px solid transparent;
+      margin: 0 8px;
+    }
+
+    .tab-button.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-button:hover:not(.active) {
+      color: var(--text-primary);
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    .form-card, .results-card, .history-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      flex-shrink: 0; /* Evita que se encoja */
+    }
+
+    .form-group {
+      margin-bottom: 20px; /* Espaciado consistente */
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px; /* Más compacto */
+      background: var(--input-bg);
+      border: 1px solid var(--border-color); /* Borde más sutil */
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); /* Sombra de enfoque */
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .calculate-btn, .add-lot-btn, .reset-history-btn {
+      flex: 1;
+      padding: 16px; /* Más compacto */
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      border: none;
+      border-radius: var(--radius);
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .calculate-btn:hover, .add-lot-btn:hover, .reset-history-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    }
+
+    .calculate-btn:active, .add-lot-btn:active, .reset-history-btn:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow);
+    }
+
+    .add-lot-btn {
+      background: linear-gradient(135deg, var(--success), var(--success-light));
+    }
+
+    .add-lot-btn:hover {
+      background: linear-gradient(135deg, var(--success-light), var(--success));
+    }
+
+    .reset-history-btn {
+      background: linear-gradient(135deg, var(--danger), var(--danger-light));
+    }
+
+    .reset-history-btn:hover {
+      background: linear-gradient(135deg, var(--danger-light), var(--danger));
+    }
+
+    .results-card {
+      display: none; /* Oculto por defecto */
+      animation: slideUp 0.5s ease;
+    }
+
+    .results-card.show {
+      display: block;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .results-title, .history-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      text-align: center;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .highlight-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .highlight-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .highlight-value {
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px; /* Más grande */
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .highlight-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+    }
+
+    .result-item, .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0; /* Más compacto */
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .result-item:hover, .history-item:hover {
+      background: var(--bg-tertiary);
+      margin: 0 -16px;
+      padding-left: 16px;
+      padding-right: 16px;
+      border-radius: 8px;
+      border-bottom: 1px solid transparent;
+    }
+
+    .result-item:last-child, .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-label, .history-label {
+      font-size: 15px;
+      color: var(--text-secondary);
+      flex: 1;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-value, .history-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: right;
+    }
+
+    .result-value.success, .history-value.success {
+      color: var(--success);
+    }
+
+    .result-value.warning, .history-value.warning {
+      color: var(--warning);
+    }
+
+    .result-value.primary, .history-value.primary {
+      color: var(--primary);
+    }
+
+    .emoji {
+      font-size: 16px;
+    }
+
+    /* Historial de Lotes */
+    .history-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex-grow: 1;
+      overflow-y: auto; /* Para scroll si hay muchos lotes */
+      max-height: 400px; /* Altura máxima para el scroll */
+      margin-bottom: 20px;
+    }
+
+    .history-list li {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .history-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-item-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .history-item-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* PWA Install prompt styles */
+    .install-prompt {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      padding: 12px 24px;
+      border-radius: 25px;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      z-index: 1000;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+    }
+
+    .install-prompt:hover {
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .form-card, .results-card, .history-card {
+        padding: 20px;
+      }
+      
+      .title {
+        font-size: 28px;
+      }
+      
+      .header-top {
+        margin-bottom: 16px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+
+    /* Smooth transitions for theme switching */
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo">AP</div>
+        <div class="theme-toggle" onclick="toggleTheme()">
+          <span class="theme-icon sun">☀️</span>
+          <span class="theme-icon moon">🌙</span>
+        </div>
+      </div>
+      <h1 class="title">Calculadora de Brecha</h1>
+      <p class="subtitle">Apolo Pay + Pago Móvil</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-button active" data-tab="calculator">Calculadora</button>
+      <button class="tab-button" data-tab="history">Historial de Lotes</button>
+    </div>
+
+    <!-- Pestaña de Calculadora -->
+    <div id="calculator-tab" class="tab-content active">
+      <div class="form-card">
+        <div class="form-group">
+          <label class="form-label">
+            <span class="emoji">💱</span>Tasa de venta (VES/USDT)
+          </label>
+          <input type="number" class="form-input" id="venta" step="0.0001" value="275" placeholder="Ej: 275.0000">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="emoji">💰</span>Monto en USDT
+          </label>
+          <input type="number" class="form-input" id="monto" step="0.01" value="10" placeholder="Ej: 10.00">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="emoji">⚡</span>Fee Apolo Pay (%)
+          </label>
+          <input type="number" class="form-input" id="feeApolo" step="0.01" value="0.2" placeholder="Ej: 0.20">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="emoji">🏦</span>Fee Banco PagoMóvil (% - solo en compra)
+          </label>
+          <input type="number" class="form-input" id="feeBanco" step="0.01" value="0.3" placeholder="Ej: 0.30">
+        </div>
+
+        <button class="calculate-btn" onclick="calcular()">
+          <span class="emoji">🧮</span>Calcular Brecha
+        </button>
+      </div>
+
+      <div class="results-card" id="resultados">
+        <h3 class="results-title">
+          <span class="emoji">📊</span>Resultados del Análisis
+        </h3>
+        
+        <div class="highlight-card">
+          <div class="highlight-value" id="tasaMaxima">-</div>
+          <div class="highlight-label">Tasa máxima sin pérdida (VES)</div>
+        </div>
+
+        <div class="result-item">
+          <span class="result-label">
+            <span class="emoji">📈</span>Brecha mínima
+          </span>
+          <span class="result-value warning" id="brechaMinima">-</span>
+        </div>
+
+        <div class="result-item">
+          <span class="result-label">
+            <span class="emoji">🎯</span>Brecha recomendada (x1.5)
+          </span>
+          <span class="result-value primary" id="brechaRecomendada">-</span>
+        </div>
+
+        <div class="result-item">
+          <span class="result-label">
+            <span class="emoji">💹</span>Tasa recompra segura
+          </span>
+          <span class="result-value success" id="tasaSegura">-</span>
+        </div>
+
+        <div class="result-item">
+          <span class="result-label">
+            <span class="emoji">💵</span>Ganancia en límite
+          </span>
+          <span class="result-value" id="gananciaLimite">-</span>
+        </div>
+
+        <div class="result-item">
+          <span class="result-label">
+            <span class="emoji">🚀</span>Ganancia recomendada
+          </span>
+          <span class="result-value success" id="gananciaRecomendada">-</span>
+        </div>
+
+        <div class="button-group">
+          <button class="add-lot-btn" onclick="agregarLote()">
+            <span class="emoji">➕</span>Agregar Lote <span id="nextLoteNumber"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pestaña de Historial de Lotes -->
+    <div id="history-tab" class="tab-content">
+      <div class="history-card">
+        <h3 class="history-title">
+          <span class="emoji">📜</span>Historial de Lotes del Día
+        </h3>
+        <ul class="history-list" id="lotesHistoryList">
+          <!-- Los lotes se agregarán aquí dinámicamente -->
+          <li class="history-item-placeholder">No hay lotes registrados aún.</li>
+        </ul>
+        <button class="reset-history-btn" onclick="resetHistory()">
+          <span class="emoji">🔄</span>Reiniciar Historial
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="install-prompt" id="installPrompt">
+    <span class="emoji">📱</span>Instalar como app
+  </div>
+
+  <script>
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 
+                        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeColor(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeColor(newTheme);
+    }
+
+    function updateThemeColor(theme) {
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (theme === 'dark') {
+        metaThemeColor.setAttribute('content', '#1a202c'); // Color oscuro para el tema oscuro
+      } else {
+        metaThemeColor.setAttribute('content', '#3b82f6'); // Color primario para el tema claro
+      }
+    }
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installPrompt').style.display = 'block';
+    });
+
+    document.getElementById('installPrompt').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        document.getElementById('installPrompt').style.display = 'none';
+      }
+    });
+
+    // Utility Functions
+    function formatCurrency(value, currency = 'VES') {
+      return `${value.toFixed(4)} ${currency}`;
+    }
+
+    function formatPercentage(value) {
+      return `${value.toFixed(4)}%`;
+    }
+
+    function formatUSDT(value) {
+      return `${value.toFixed(6)} USDT`;
+    }
+
+    // Variables para almacenar los últimos resultados calculados
+    let lastCalculatedResults = null;
+    let nextLoteCounter = 1; // Contador para la numeración de lotes
+
+    function updateNextLoteNumberDisplay() {
+      document.getElementById('nextLoteNumber').textContent = `(Lote ${nextLoteCounter})`;
+    }
+
+    function calcular() {
+      const P_s = parseFloat(document.getElementById('venta').value);
+      const montoUSDT = parseFloat(document.getElementById('monto').value);
+      const feeApolo = parseFloat(document.getElementById('feeApolo').value) / 100;
+      const feeBanco = parseFloat(document.getElementById('feeBanco').value) / 100;
+
+      // Validación de inputs
+      if (isNaN(P_s) || isNaN(montoUSDT) || isNaN(feeApolo) || isNaN(feeBanco)) {
+        alert('Por favor, completa todos los campos con valores válidos');
+        return;
+      }
+
+      if (P_s <= 0 || montoUSDT <= 0) {
+        alert('Los valores deben ser mayores que cero');
+        return;
+      }
+
+      // Cálculos
+      const P_b_max = P_s * Math.pow((1 - feeApolo), 2) * (1 - feeBanco);
+      const brechaAbs = P_s - P_b_max;
+      const brechaPct = (brechaAbs / P_s) * 100;
+
+      // Ganancia teórica
+      const vesRecibidos = montoUSDT * P_s * (1 - feeApolo);
+      const vesNetosRecompra = vesRecibidos * (1 - feeApolo) * (1 - feeBanco);
+      const usdtRecomprados = vesNetosRecompra / P_b_max;
+      const gananciaUSDT = usdtRecomprados - montoUSDT;
+
+      // Recomendación de margen de seguridad
+      const brechaSegura = brechaAbs * 1.5;
+      const brechaPctSegura = brechaPct * 1.5;
+      const P_b_x15 = P_s - brechaSegura;
+
+      // Ganancia estimada segura
+      const usdtRecompradosSeguros = vesNetosRecompra / P_b_x15;
+      const gananciaSeguraUSDT = usdtRecompradosSeguros - montoUSDT;
+
+      // Almacenar los resultados para el botón "Agregar Lote"
+      lastCalculatedResults = {
+        loteName: `Lote ${nextLoteCounter}`, // Asignar el nombre del lote automáticamente
+        tasaIngresada: P_s,
+        tasaMaximaRecompra: P_b_max,
+        brechaMinima: brechaAbs,
+        brechaMinimaPct: brechaPct,
+        brechaRecomendada: brechaSegura,
+        brechaRecomendadaPct: brechaPctSegura,
+        tasaSegura: P_b_x15,
+        gananciaLimite: gananciaUSDT,
+        gananciaRecomendada: gananciaSeguraUSDT
+      };
+
+      // Actualizar UI
+      document.getElementById('tasaMaxima').textContent = formatCurrency(P_b_max);
+      document.getElementById('brechaMinima').textContent = `${formatCurrency(brechaAbs)} (${formatPercentage(brechaPct)})`;
+      document.getElementById('brechaRecomendada').textContent = `${formatCurrency(brechaSegura)} (${formatPercentage(brechaPctSegura)})`;
+      document.getElementById('tasaSegura').textContent = formatCurrency(P_b_x15);
+      document.getElementById('gananciaLimite').textContent = formatUSDT(gananciaUSDT);
+      document.getElementById('gananciaRecomendada').textContent = formatUSDT(gananciaSeguraUSDT);
+
+      // Mostrar resultados con animación
+      const resultsCard = document.getElementById('resultados');
+      resultsCard.classList.add('show');
+      resultsCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      updateNextLoteNumberDisplay(); // Actualizar el número del lote en el botón
+    }
+
+    // Historial de Lotes
+    let lotesHistory = JSON.parse(localStorage.getItem('lotesHistory')) || [];
+
+    function renderHistory() {
+      const historyList = document.getElementById('lotesHistoryList');
+      historyList.innerHTML = ''; // Limpiar lista existente
+
+      if (lotesHistory.length === 0) {
+        historyList.innerHTML = '<li class="history-item-placeholder">No hay lotes registrados aún.</li>';
+        return;
+      }
+
+      lotesHistory.forEach(lote => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <div class="history-item-row">
+            <span class="history-item-label">Lote:</span>
+            <span class="history-item-value">${lote.loteName}</span>
+          </div>
+          <div class="history-item-row">
+            <span class="history-item-label">Tasa Ingresada:</span>
+            <span class="history-item-value">${formatCurrency(lote.tasaIngresada)}</span>
+          </div>
+          <div class="history-item-row">
+            <span class="history-item-label">Tasa Máx. Recompra:</span>
+            <span class="history-item-value success">${formatCurrency(lote.tasaMaximaRecompra)}</span>
+          </div>
+          <div class="history-item-row">
+            <span class="history-item-label">Brecha Mínima:</span>
+            <span class="history-item-value warning">${formatCurrency(lote.brechaMinima)} (${formatPercentage(lote.brechaMinimaPct)})</span>
+          </div>
+          <div class="history-item-row">
+            <span class="history-item-label">Brecha Recomendada:</span>
+            <span class="history-item-value primary">${formatCurrency(lote.brechaRecomendada)} (${formatPercentage(lote.brechaRecomendadaPct)})</span>
+          </div>
+          <div class="history-item-row">
+            <span class="history-item-label">Tasa Segura:</span>
+            <span class="history-item-value success">${formatCurrency(lote.tasaSegura)}</span>
+          </div>
+          <div class="history-item-row">
+            <span class="history-item-label">Ganancia Límite:</span>
+            <span class="history-item-value">${formatUSDT(lote.gananciaLimite)}</span>
+          </div>
+          <div class="history-item-row">
+            <span class="history-item-label">Ganancia Recomendada:</span>
+            <span class="history-item-value success">${formatUSDT(lote.gananciaRecomendada)}</span>
+          </div>
+        `;
+        historyList.appendChild(listItem);
+      });
+    }
+
+    function agregarLote() {
+      if (!lastCalculatedResults) {
+        alert('Por favor, realiza un cálculo primero antes de agregar un lote.');
+        return;
+      }
+
+      lotesHistory.push(lastCalculatedResults);
+      localStorage.setItem('lotesHistory', JSON.stringify(lotesHistory));
+      renderHistory();
+      alert(`Lote "${lastCalculatedResults.loteName}" agregado al historial.`);
+      
+      // Incrementar el contador para el próximo lote
+      nextLoteCounter++;
+      updateNextLoteNumberDisplay();
+
+      // Limpiar resultados calculados para evitar duplicados accidentales
+      lastCalculatedResults = null;
+      document.getElementById('resultados').classList.remove('show');
+    }
+
+    function resetHistory() {
+      if (confirm('¿Estás seguro de que quieres reiniciar el historial de lotes? Esta acción no se puede deshacer.')) {
+        lotesHistory = [];
+        localStorage.removeItem('lotesHistory');
+        nextLoteCounter = 1; // Reiniciar el contador de lotes
+        updateNextLoteNumberDisplay();
+        renderHistory();
+        alert('Historial de lotes reiniciado.');
+      }
+    }
+
+    // Manejo de pestañas
+    function setupTabs() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+
+          button.classList.add('active');
+          document.getElementById(`${button.dataset.tab}-tab`).classList.add('active');
+
+          // Si se activa la pestaña de historial, renderizarla
+          if (button.dataset.tab === 'history') {
+            renderHistory();
+          }
+        });
+      });
+    }
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      setupTabs();
+      renderHistory(); // Renderizar historial al cargar la página
+      
+      // Inicializar el contador de lotes basado en el historial existente
+      if (lotesHistory.length > 0) {
+        const lastLoteName = lotesHistory[lotesHistory.length - 1].loteName;
+        const match = lastLoteName.match(/Lote (\d+)/);
+        if (match && match[1]) {
+          nextLoteCounter = parseInt(match[1]) + 1;
+        }
+      }
+      updateNextLoteNumberDisplay(); // Mostrar el número del próximo lote
+      
+      // Realizar un cálculo inicial al cargar la página para mostrar valores por defecto
+      calcular();
+    });
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        updateThemeColor(newTheme);
+      }
+    });
+  </script>
+</body>
+</html>
