@@ -767,7 +767,7 @@
       }
 
       // Cálculos
-      const P_b_max = P_s * Math.pow((1 - feeApolo), 2) * (1 - feeBanco);
+      const P_b_max = P_s * (1 - feeApolo) / (1 + feeBanco);
       const brechaAbs = P_s - P_b_max;
       const brechaPct = (brechaAbs / P_s) * 100;
 
