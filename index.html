@@ -5,16 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora de Brecha - Apolo Pay</title>
   
-  <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#2563eb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Apolo Pay Calc">
   
-  <!-- PWA Icons -->
   <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0OCIgZmlsbD0iIzI1NjNlYiIvPjx0ZXh0IHg9Ijk2IiB5PSIxMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0OCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QVA8L3RleHQ+PC9zdmc+">
   
-  <!-- Google Fonts (ejemplo) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -569,7 +566,6 @@
       <button class="tab-button" data-tab="history">Historial de Lotes</button>
     </div>
 
-    <!-- Pestaña de Calculadora -->
     <div id="calculator-tab" class="tab-content active">
       <div class="form-card">
         <div class="form-group">
@@ -658,14 +654,12 @@
       </div>
     </div>
 
-    <!-- Pestaña de Historial de Lotes -->
     <div id="history-tab" class="tab-content">
       <div class="history-card">
         <h3 class="history-title">
           <span class="emoji">📜</span>Historial de Lotes del Día
         </h3>
         <ul class="history-list" id="lotesHistoryList">
-          <!-- Los lotes se agregarán aquí dinámicamente -->
           <li class="history-item-placeholder">No hay lotes registrados aún.</li>
         </ul>
         <button class="reset-history-btn" onclick="resetHistory()">
@@ -767,7 +761,7 @@
       }
 
       // Cálculos
-      const P_b_max = P_s * (1 - feeApolo) / (1 + feeBanco);
+      const P_b_max = P_s * Math.pow((1 - feeApolo), 2) * (1 - feeBanco);
       const brechaAbs = P_s - P_b_max;
       const brechaPct = (brechaAbs / P_s) * 100;
 
